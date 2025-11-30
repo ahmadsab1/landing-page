@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>TextDupe — مقارنة النصوص الذكية</title>
+    <meta
+      name="description"
+      content="TextDupe: قارن نصوص وملفات (PDF, Excel, DOCX, صور OCR) بسرعة ودقة. تقارير PDF بالعربي وشات بوت مدمج. انتظرونا قريباً!"
+    />
+    <link rel="icon" href="images/logo.png" />
+
+    <!-- Google font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;700;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* ---------- Reset & base ---------- */
+      :root {
+        --bg-1: #071129; /* deep */
+        --bg-2: #0b2540;
+        --accent-a: #7c3aed;
+        --accent-b: #06b6d4;
+        --glass-border: rgba(255, 255, 255, 0.06);
+        --glass-bg: rgba(255, 255, 255, 0.03);
+        --muted: rgba(255, 255, 255, 0.78);
+        --muted-2: rgba(255, 255, 255, 0.6);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        font-family: "Tajawal", system-ui, -apple-system, Segoe UI, Roboto;
+        background: linear-gradient(120deg, var(--bg-1), var(--bg-2));
+        color: #fff;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      img {
+        max-width: 100%;
+        display: block;
+      }
+
+      /* ---------- layout ---------- */
+      .wrap {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 28px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(6px);
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .brand-logo {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        object-fit: cover;
+        box-shadow: 0 8px 30px rgba(6, 11, 23, 0.6);
+      }
+      .brand-title {
+        font-weight: 800;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+      }
+      .brand-sub {
+        font-weight: 400;
+        font-size: 12px;
+        color: var(--muted-2);
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+
+      /* ---------- hero ---------- */
+      .hero {
+        display: grid;
+        grid-template-columns: 1fr 420px;
+        gap: 28px;
+        align-items: center;
+        padding-top: 28px;
+        padding-bottom: 28px;
+      }
+      .hero-card {
+        padding: 28px;
+        border-radius: 16px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.03),
+          rgba(255, 255, 255, 0.02)
+        );
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 24px 80px rgba(2, 6, 23, 0.6);
+      }
+      .hero-title {
+        font-size: 28px;
+        margin: 0 0 6px 0;
+        font-weight: 900;
+      }
+      .hero-lead {
+        color: var(--muted);
+        line-height: 1.6;
+        margin-bottom: 18px;
+      }
+      .bullets {
+        display: grid;
+        gap: 10px;
+        margin: 14px 0;
+        padding: 0;
+        list-style: none;
+      }
+      .bullet {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .bullet .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+        margin-top: 6px;
+        flex: 0 0 10px;
+      }
+      .bullet p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .cta-row {
+        display: flex;
+        gap: 12px;
+        margin-top: 16px;
+        flex-wrap: wrap;
+      }
+      .input {
+        flex: 1;
+        min-width: 180px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        background: transparent;
+        color: #fff;
+        outline: none;
+      }
+      .btn-primary {
+        background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+        padding: 12px 18px;
+        border-radius: 12px;
+        color: #fff;
+        border: 0;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 14px 50px rgba(99, 102, 241, 0.12);
+      }
+      .btn-ghost {
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 12px 16px;
+        border-radius: 10px;
+        color: var(--muted);
+        cursor: pointer;
+      }
+
+      /* ---------- mockup (right) ---------- */
+      .mockup {
+        display: flex;
+        justify-content: center;
+      }
+      .device {
+        width: 380px;
+        border-radius: 18px;
+        padding: 14px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 26px 90px rgba(2, 6, 23, 0.6);
+        display: flex;
+        flex-direction: column;
+        height: 360px;
+      }
+      .device-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 8px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.01);
+        color: var(--muted-2);
+        font-weight: 700;
+      }
+      .device-body {
+        flex: 1;
+        padding: 10px;
+        overflow: auto;
+        color: var(--muted);
+      }
+      .device-foot {
+        text-align: center;
+        padding: 8px;
+        color: var(--muted-2);
+        font-size: 13px;
+      }
+
+      /* ---------- features ---------- */
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 20px;
+      }
+      .feature {
+        padding: 16px;
+        border-radius: 12px;
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.02),
+          rgba(255, 255, 255, 0.01)
+        );
+        border: 1px solid rgba(255, 255, 255, 0.02);
+      }
+      .feature h4 {
+        margin: 0 0 6px 0;
+      }
+      .feature p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      /* ---------- testimonial / trust ---------- */
+      .trust {
+        margin-top: 22px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .trust .pill {
+        padding: 10px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.02);
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      /* ---------- footer ---------- */
+      .footer {
+        margin-top: 36px;
+        padding: 22px;
+        border-top: 1px solid rgba(255, 255, 255, 0.03);
+        color: var(--muted);
+        font-size: 14px;
+        text-align: center;
+        border-radius: 6px 6px 0 0;
+      }
+
+      /* ---------- small screen ---------- */
+      @media (max-width: 980px) {
+        .hero {
+          grid-template-columns: 1fr;
+          padding-top: 18px;
+        }
+        .mockup {
+          order: -1;
+        }
+        .features {
+          grid-template-columns: 1fr;
+        }
+        .brand-title {
+          font-size: 16px;
+        }
+        .device {
+          width: 100%;
+          height: 300px;
+        }
+      }
+
+      /* ---------- micro animations ---------- */
+      .brand-logo {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .brand-logo:hover {
+        transform: scale(1.06);
+        box-shadow: 0 26px 80px rgba(6, 11, 23, 0.6);
+      }
+      .btn-primary:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 30px 80px rgba(99, 102, 241, 0.12);
+      }
+      .device-body pre {
+        white-space: pre-wrap;
+        font-family: inherit;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      /* ---------- decorative gradient blobs ---------- */
+      .blob {
+        position: fixed;
+        width: 360px;
+        height: 360px;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.26;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .blob.a {
+        right: -80px;
+        top: -60px;
+        background: linear-gradient(90deg, #7c3aed, #06b6d4);
+      }
+      .blob.b {
+        left: -120px;
+        bottom: -80px;
+        background: linear-gradient(90deg, #f59e0b, #f97316);
+        opacity: 0.12;
+      }
+
+      /* ---------- accessibility helpers ---------- */
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="blob a" aria-hidden="true"></div>
+    <div class="blob b" aria-hidden="true"></div>
+
+    <div class="wrap">
+      <header class="topbar container" role="banner">
+        <div class="brand" role="img" aria-label="TextDupe">
+          <img src="images/logo.png" alt="TextDupe logo" class="brand-logo" />
+          <div>
+            <div class="brand-title">TextDupe</div>
+            <div class="brand-sub">مقارنة النصوص والملفات — ذكي وسريع</div>
+          </div>
+        </div>
+
+        <nav aria-label="main navigation">
+          <button
+            class="btn-ghost"
+            onclick="document.getElementById('signup').scrollIntoView({behavior:'smooth'})"
+          >
+            أعلمني عند الإطلاق
+          </button>
+        </nav>
+      </header>
+
+      <main class="container" role="main">
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="hero-card" role="region">
+            <h1 id="hero-title" class="hero-title">
+              قارن نصوصك وملفاتك بدقّة باستخدام AI
+            </h1>
+            <p class="hero-lead">
+              TextDupe يدمج بين المقارنة الحرفية والتحليل المعنوي (semantic)
+              لاستخراج المطابقات بدقة، يدعم العربي والإنجليزي، وبيطلع تقرير PDF
+              مرتب بالعربي.
+            </p>
+
+            <ul class="bullets" aria-hidden="false">
+              <li class="bullet">
+                <span class="dot"></span>
+                <p>دعم ملفات: PDF · Excel · DOCX · صور (OCR)</p>
+              </li>
+              <li class="bullet">
+                <span class="dot"></span>
+                <p>مقارنة معنوية وحرفية باستخدام embeddings</p>
+              </li>
+              <li class="bullet">
+                <span class="dot"></span>
+                <p>تقرير PDF جاهز بالعربي للطباعة أو التحميل</p>
+              </li>
+            </ul>
+
+            <div class="cta-row" role="form" aria-labelledby="cta-label">
+              <label id="cta-label" class="sr-only">سجل بريدك</label>
+              <input
+                aria-label="بريدك"
+                class="input"
+                id="email"
+                type="email"
+                placeholder="اكتب بريدك للإشعارات (مثال: you@mail.com)"
+              />
+              <button class="btn-primary" onclick="subscribe()">
+                أعلمني أولاً
+              </button>
+              <button class="btn-ghost" onclick="location.href='#features'">
+                شاهد المميزات
+              </button>
+            </div>
+
+            <div class="trust" aria-hidden="true" style="margin-top: 18px">
+              <div class="pill">نسخة تجريبية مجانية</div>
+              <div class="pill">يدعم Arabic shaping</div>
+              <div class="pill">تجربة سريعة — ثواني</div>
+            </div>
+          </div>
+
+          <aside class="mockup" aria-label="معاينة">
+            <div class="device" role="img" aria-label="Device preview">
+              <div class="device-head">TextDupe — معاينة</div>
+              <div class="device-body">
+                <pre>
+مثال: قارن هذا الملف Excel مع ملف آخر. النتيجة:
+- النسبة الكلية: 78.5%
+- مطابقات معنوية: 12 سطر
+- مطابقات حرفية: 8 مقتطفات
+تقرير PDF جاهز بالنتيجة.
+</pre
+                >
+              </div>
+              <div class="device-foot">تجربة مشوقة — استعد للإطلاق 🎯</div>
+            </div>
+          </aside>
+        </section>
+
+        <section id="features" class="container" style="padding-top: 8px">
+          <div class="features" role="region" aria-labelledby="features-h">
+            <div class="feature">
+              <h4 id="features-h">مقارنة ذكية</h4>
+              <p>
+                نظام يجمع بين البحث الحرفي والتحليل الدلالي ليعطيك تشابه حقيقي
+                بين الجمل والملفات.
+              </p>
+            </div>
+            <div class="feature">
+              <h4>دعم متقدم للملفات</h4>
+              <p>PDF, Excel, DOCX وصور — نفك الملف ونستخرج النص بدقّة OCR.</p>
+            </div>
+            <div class="feature">
+              <h4>تقرير PDF</h4>
+              <p>
+                تقرير مرتب بالعربية يتضمن المطابقات، النسب، ومقتطفات قابلة
+                للطباعة.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section id="signup" style="margin-top: 28px">
+          <div class="hero-card" style="text-align: center">
+            <h3 style="margin-top: 0">انتظرونا — كل شيء مفتوح للجميع</h3>
+            <p style="color: var(--muted)">
+              الإصدار الأول سيكون مجانيًا للجميع. سجّل بريدك وسنرسل لك رابط
+              النسخة التجريبية فور الإطلاق.
+            </p>
+
+            <div
+              style="
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-top: 12px;
+              "
+            >
+              <input
+                id="email2"
+                class="input"
+                type="email"
+                placeholder="بريدك الإلكتروني"
+                style="max-width: 420px"
+              />
+              <button class="btn-primary" onclick="subscribeFromForm()">
+                سجّل إعجابي
+              </button>
+            </div>
+            <p style="color: var(--muted); margin-top: 12px; font-size: 13px">
+              أو تواصل معنا:
+              <a
+                href="mailto:ahmadsab305@gmail.com"
+                style="color: #a5f3fc; text-decoration: none"
+                >ahmadsab305@gmail.com</a
+              >
+            </p>
+          </div>
+        </section>
+
+        <footer class="footer" role="contentinfo">
+          © 2025 TextDupe — مطوّر بواسطة Ahmad Sabah
+        </footer>
+      </main>
+    </div>
+
+    <script>
+      function subscribe() {
+        const v = document.getElementById("email")?.value || "";
+        if (!v || !v.includes("@")) {
+          alert("اكتب بريد صحيح علشان نبلغك");
+          return;
+        }
+        alert("شكراً! سنرسل لك إشعار عند الإطلاق: " + v);
+        // فتح البريد لارسال رسالة (بإمكانك تغييره لاحقًا لارسال API)
+        window.location.href =
+          "mailto:ahmadsab305@gmail.com?subject=تسجيل%20TextDupe&body=" +
+          encodeURIComponent("سجلني:%20" + v);
+      }
+      function subscribeFromForm() {
+        const v = document.getElementById("email2")?.value || "";
+        if (!v || !v.includes("@")) {
+          alert("اكتب بريد صحيح");
+          return;
+        }
+        alert("تم التسجيل: " + v);
+        window.location.href =
+          "mailto:ahmadsab305@gmail.com?subject=تسجيل%20TextDupe&body=" +
+          encodeURIComponent("سجلني:%20" + v);
+      }
+    </script>
+  </body>
+</html>
